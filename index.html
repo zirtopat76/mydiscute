@@ -3,227 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sohbet Uygulaması</title>
+    <title>Sohbet Uygulaması - Discute</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Playfair Display & Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK (v9 Modular Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <style>
+        body {
+            background-image: linear-gradient(rgba(245, 240, 235, 0.85), rgba(235, 228, 220, 0.90)), 
+                              url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Poppins', sans-serif;
+            color: #2c2c2c;
+        }
+
+        .french-title {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 35px rgba(50, 40, 30, 0.1);
+        }
+
+        .btn-french {
+            background: linear-gradient(135deg, #722F37 0%, #4A1525 100%);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .btn-french:hover {
+            background: linear-gradient(135deg, #853742 0%, #5a1a2e 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(114, 47, 55, 0.3);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 h-screen font-sans flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white">
+<body class="h-screen flex items-center justify-center p-2 sm:p-4 antialiased selection:bg-rose-900 selection:text-white">
 
     <!-- APP CONTAINER -->
-    <div id="app" class="w-full max-w-4xl mx-auto h-full flex flex-col bg-white shadow-xl relative overflow-hidden md:h-[95vh] md:my-auto md:rounded-2xl border border-gray-200">
+    <div id="app" class="w-full max-w-3xl h-full max-h-[92vh] flex flex-col glass-card rounded-2xl overflow-hidden relative border border-white/60">
         
         <!-- HEADER -->
-        <header class="bg-indigo-600 text-white p-4 flex justify-between items-center shadow-md z-10">
+        <header class="bg-[#722F37] text-white p-4 flex justify-between items-center shadow-md z-10">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-lg shadow-inner border border-indigo-400">
-                    <i class="fa-solid fa-comments"></i>
+                <div class="w-10 h-10 bg-rose-900/50 rounded-full flex items-center justify-center font-bold text-lg border border-rose-300/30">
+                    <i class="fa-solid fa-comments text-amber-100"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">Ortak Sohbet Odası</h1>
-                    <span id="userBadge" class="text-xs text-indigo-200 block hidden">
-                        <i class="fa-solid fa-circle text-green-400 text-[10px] mr-1"></i>
+                    <h1 class="french-title font-bold text-xl tracking-wide text-amber-50">Salon de Discussion</h1>
+                    <span id="userBadge" class="text-xs text-rose-200 block hidden">
+                        <i class="fa-solid fa-circle text-emerald-400 text-[9px] mr-1"></i>
                         <span id="currentUsername"></span>
                     </span>
                 </div>
             </div>
             
             <div class="flex items-center space-x-2">
-                <button id="configBtn" onclick="openConfigModal()" class="p-2 hover:bg-indigo-700 rounded-lg text-indigo-100 hover:text-white transition-colors title='Firebase Ayarları'">
-                    <i class="fa-solid fa-gear text-lg"></i>
-                </button>
-                <button id="logoutBtn" onclick="logout()" class="p-2 hover:bg-red-600 rounded-lg text-indigo-100 hover:text-white transition-colors hidden" title="Çıkış Yap">
+                <button id="logoutBtn" onclick="logout()" class="p-2 hover:bg-rose-800 rounded-lg text-rose-100 transition-colors hidden" title="Déconnexion (Çıkış)">
                     <i class="fa-solid fa-right-from-bracket text-lg"></i>
                 </button>
             </div>
         </header>
 
         <!-- LOGIN SCREEN -->
-        <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50">
-            <div class="w-full max-w-md bg-white rounded-xl shadow-md p-8 border border-gray-100">
+        <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6">
+            <div class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white">
                 <div class="text-center mb-6">
-                    <div class="inline-flex p-3 bg-indigo-50 text-indigo-600 rounded-full mb-3">
+                    <div class="inline-flex p-3 bg-rose-50 text-[#722F37] rounded-full mb-3 border border-rose-100">
                         <i class="fa-solid fa-lock text-2xl"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-800">Hoş Geldiniz</h2>
-                    <p class="text-sm text-gray-500 mt-1">Sohbete katılmak için bilgilerinizi girin</p>
+                    <h2 class="french-title text-2xl font-bold text-gray-800">Bienvenue</h2>
+                    <p class="text-xs text-gray-500 mt-1">Sohbete katılmak için kullanıcı adınızı ve ortak şifreyi girin</p>
                 </div>
 
                 <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Kullanıcı Adınız / Rumuz</label>
-                        <input type="text" id="usernameInput" required placeholder="Örn: Ahmet" 
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                        <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Kullanıcı Adı / Rumuz</label>
+                        <input type="text" id="usernameInput" required placeholder="Örn: Jean / Ahmet" autocomplete="off"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#722F37] focus:border-[#722F37] outline-none transition bg-white/80 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Ortak Oda Şifresi</label>
-                        <input type="password" id="passwordInput" required placeholder="••••••••" 
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
-                        <p class="text-xs text-gray-400 mt-1">Varsayılan şifre: <span class="font-mono bg-gray-100 px-1 rounded">123456</span></p>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Ortak Oda Şifresi</label>
+                        <input type="password" id="passwordInput" required placeholder="••••••••" autocomplete="new-password"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#722F37] focus:border-[#722F37] outline-none transition bg-white/80 text-sm">
+                        <p class="text-xs text-gray-400 mt-1">Şifre: <span class="font-mono bg-amber-50 text-amber-900 px-1.5 py-0.5 rounded border border-amber-200">123456</span></p>
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2">
+                    <button type="submit" class="w-full btn-french font-medium py-3 rounded-xl transition duration-200 shadow-md flex items-center justify-center space-x-2 text-sm">
                         <span>Odaya Katıl</span>
-                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
                     </button>
                 </form>
-
-                <div id="firebaseWarn" class="mt-6 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start space-x-2 hidden">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-base mt-0.5"></i>
-                    <div>
-                        <strong>Firebase Bağlantısı Yok!</strong>
-                        <p>Lütfen sağ üstteki ayarlar (⚙️) butonuna basarak Firebase bilgilerinizi girin.</p>
-                    </div>
-                </div>
             </div>
         </div>
 
         <!-- CHAT SCREEN -->
-        <div id="chatScreen" class="flex-1 flex flex-col hidden overflow-hidden bg-slate-50 relative">
+        <div id="chatScreen" class="flex-1 flex flex-col hidden overflow-hidden bg-white/40 backdrop-blur-sm relative">
             <!-- Messages List -->
             <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
-                <!-- Dynamic Messages Will Be Appended Here -->
-            </div>
-
-            <!-- Image Preview Area -->
-            <div id="imagePreviewContainer" class="px-4 py-2 bg-indigo-50 border-t border-indigo-100 flex items-center justify-between hidden">
-                <div class="flex items-center space-x-3 overflow-hidden">
-                    <img id="imagePreview" class="h-12 w-12 object-cover rounded border border-indigo-200" src="" alt="Önizleme">
-                    <span id="imageFileName" class="text-xs text-gray-600 truncate max-w-[200px]">resim.png</span>
-                </div>
-                <button onclick="cancelImageSelection()" class="text-gray-400 hover:text-red-500 p-1">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <!-- Dynamic Messages -->
             </div>
 
             <!-- Message Input Form -->
-            <form id="messageForm" onsubmit="sendMessage(event)" class="p-3 bg-white border-t border-gray-200 flex items-center space-x-2">
-                <label class="cursor-pointer p-2.5 text-gray-500 hover:text-indigo-600 hover:bg-slate-100 rounded-full transition">
-                    <i class="fa-solid fa-image text-xl"></i>
-                    <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
-                </label>
-                
+            <form id="messageForm" onsubmit="sendMessage(event)" class="p-3 bg-white/90 border-t border-rose-100 flex items-center space-x-2">
                 <input type="text" id="messageInput" placeholder="Mesajınızı yazın..." autocomplete="off"
-                    class="flex-1 px-4 py-2.5 border border-gray-300 rounded-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm">
+                    class="flex-1 px-4 py-2.5 border border-gray-300 rounded-full focus:ring-2 focus:ring-[#722F37] focus:border-[#722F37] outline-none transition text-sm bg-white">
                 
-                <button type="submit" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full transition shadow-md flex items-center justify-center w-11 h-11 shrink-0">
-                    <i class="fa-solid fa-paper-plane text-sm"></i>
+                <button type="submit" id="sendBtn" class="btn-french p-3 rounded-full transition shadow-md flex items-center justify-center w-11 h-11 shrink-0">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
                 </button>
             </form>
         </div>
 
-    </div>
-
-    <!-- CONFIG MODAL -->
-    <div id="configModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100">
-            <div class="bg-gray-800 text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold flex items-center space-x-2">
-                    <i class="fa-solid fa-sliders text-indigo-400"></i>
-                    <span>Firebase Kurulum Ayarları</span>
-                </h3>
-                <button onclick="closeConfigModal()" class="text-gray-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            
-            <form onsubmit="saveFirebaseConfig(event)" class="p-6 space-y-4">
-                <p class="text-xs text-gray-500">Firebase konsolunuzdan aldığınız web uygulaması yapılandırma (firebaseConfig) bilgilerini buraya yapıştırın.</p>
-                
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">API Key</label>
-                    <input type="text" id="cfgApiKey" required class="w-full px-3 py-1.5 border text-xs font-mono rounded border-gray-300 focus:ring-1 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Auth Domain</label>
-                    <input type="text" id="cfgAuthDomain" required class="w-full px-3 py-1.5 border text-xs font-mono rounded border-gray-300 focus:ring-1 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Project ID</label>
-                    <input type="text" id="cfgProjectId" required class="w-full px-3 py-1.5 border text-xs font-mono rounded border-gray-300 focus:ring-1 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Storage Bucket</label>
-                    <input type="text" id="cfgStorageBucket" required class="w-full px-3 py-1.5 border text-xs font-mono rounded border-gray-300 focus:ring-1 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Messaging Sender ID</label>
-                    <input type="text" id="cfgMessagingSenderId" required class="w-full px-3 py-1.5 border text-xs font-mono rounded border-gray-300 focus:ring-1 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">App ID</label>
-                    <input type="text" id="cfgAppId" required class="w-full px-3 py-1.5 border text-xs font-mono rounded border-gray-300 focus:ring-1 focus:ring-indigo-500 outline-none">
-                </div>
-
-                <div class="pt-2 flex space-x-3 justify-end">
-                    <button type="button" onclick="closeConfigModal()" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">İptal</button>
-                    <button type="submit" class="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow">Kaydet & Bağlan</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // APP STATE
-        const SHARED_PASSWORD = "123456"; // Sabit Ortak Şifre
-        let db = null;
-        let storage = null;
-        let currentUser = localStorage.getItem('chat_username') || null;
-        let selectedFile = null;
+        // Sabit Firebase Konfigürasyonu (Tüm cihazlarda doğrudan çalışır)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgoQTlk16RbjZI6ynRrYBOhqYUx9EoMlg",
+            authDomain: "mydiscute.firebaseapp.com",
+            projectId: "mydiscute",
+            storageBucket: "mydiscute.firebasestorage.app",
+            messagingSenderId: "780572330170",
+            appId: "1:780572330170:web:a2953844c71ae8720f1a83"
+        };
 
-        // INITIALIZATION
+        const SHARED_PASSWORD = "123456";
+        let db = null;
+        let currentUser = null;
+
         window.addEventListener('DOMContentLoaded', () => {
             initFirebase();
-            checkAutoLogin();
         });
 
         function initFirebase() {
-            const config = getSavedConfig();
-            if (config) {
-                try {
-                    if (!firebase.apps.length) {
-                        firebase.initializeApp(config);
-                    }
-                    db = firebase.firestore();
-                    storage = firebase.storage();
-                    document.getElementById('firebaseWarn').classList.add('hidden');
-                } catch (e) {
-                    console.error("Firebase başlatılamadı:", e);
-                    document.getElementById('firebaseWarn').classList.remove('hidden');
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
                 }
-            } else {
-                document.getElementById('firebaseWarn').classList.remove('hidden');
+                db = firebase.firestore();
+            } catch (e) {
+                console.error("Firebase başlatma hatası:", e);
             }
         }
 
-        function getSavedConfig() {
-            const saved = localStorage.getItem('firebase_config');
-            return saved ? JSON.parse(saved) : null;
-        }
-
-        function checkAutoLogin() {
-            if (currentUser && db) {
-                showChatScreen();
-            }
-        }
-
-        // LOGIN / LOGOUT
         function handleLogin(e) {
             e.preventDefault();
             const username = document.getElementById('usernameInput').value.trim();
             const password = document.getElementById('passwordInput').value.trim();
-
-            if (!db) {
-                alert("Lütfen önce Firebase ayarlarınızı yapılandırın!");
-                openConfigModal();
-                return;
-            }
 
             if (password !== SHARED_PASSWORD) {
                 alert("Hatalı ortak şifre!");
@@ -232,18 +172,18 @@
 
             if (username) {
                 currentUser = username;
-                localStorage.setItem('chat_username', username);
                 showChatScreen();
             }
         }
 
         function logout() {
             currentUser = null;
-            localStorage.removeItem('chat_username');
             document.getElementById('chatScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('logoutBtn').classList.add('hidden');
             document.getElementById('userBadge').classList.add('hidden');
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('passwordInput').value = '';
         }
 
         function showChatScreen() {
@@ -256,7 +196,6 @@
             loadMessages();
         }
 
-        // MESSAGES REALTIME LISTENER
         function loadMessages() {
             db.collection("messages").orderBy("timestamp", "asc")
                 .onSnapshot((snapshot) => {
@@ -270,36 +209,19 @@
                         const msgDiv = document.createElement('div');
                         msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} group`;
 
-                        let imageHtml = '';
-                        if (data.imageUrl) {
-                            imageHtml = `
-                                <div class="mt-1 mb-1 max-w-xs overflow-hidden rounded-lg border border-indigo-100 shadow-sm">
-                                    <a href="${data.imageUrl}" target="_blank">
-                                        <img src="${data.imageUrl}" class="w-full h-auto max-h-60 object-cover hover:opacity-95 transition" loading="lazy">
-                                    </a>
-                                </div>
-                            `;
-                        }
-
-                        let textHtml = '';
-                        if (data.text) {
-                            textHtml = `<p class="text-sm break-words">${escapeHtml(data.text)}</p>`;
-                        }
-
                         const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
 
                         msgDiv.innerHTML = `
-                            <div class="flex items-center space-x-1 max-w-[80%]">
+                            <div class="flex items-center space-x-1 max-w-[85%] sm:max-w-[75%]">
                                 ${isMe ? `
-                                    <button onclick="deleteMessage('${doc.id}', '${data.imageStoragePath || ''}')" class="opacity-0 group-hover:opacity-100 transition text-gray-400 hover:text-red-500 p-1 text-xs">
+                                    <button onclick="deleteMessage('${doc.id}')" class="opacity-0 group-hover:opacity-100 transition text-gray-400 hover:text-rose-600 p-1 text-xs" title="Mesajı Sil">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 ` : ''}
-                                <div class="${isMe ? 'bg-indigo-600 text-white rounded-l-2xl rounded-tr-2xl' : 'bg-white text-gray-800 rounded-r-2xl rounded-tl-2xl shadow-sm border border-gray-100'} p-3 text-left">
-                                    <div class="text-[10px] font-bold ${isMe ? 'text-indigo-200' : 'text-indigo-600'} mb-0.5">${escapeHtml(data.sender)}</div>
-                                    ${textHtml}
-                                    ${imageHtml}
-                                    <div class="text-[9px] ${isMe ? 'text-indigo-200' : 'text-gray-400'} text-right mt-1">${time}</div>
+                                <div class="${isMe ? 'bg-[#722F37] text-white rounded-l-2xl rounded-tr-2xl shadow-md' : 'bg-white text-gray-800 rounded-r-2xl rounded-tl-2xl shadow-sm border border-gray-100'} p-3 text-left">
+                                    <div class="text-[10px] font-bold ${isMe ? 'text-amber-200' : 'text-[#722F37]'} mb-0.5">${escapeHtml(data.sender)}</div>
+                                    <p class="text-sm break-words leading-relaxed">${escapeHtml(data.text || '')}</p>
+                                    <div class="text-[9px] ${isMe ? 'text-rose-200' : 'text-gray-400'} text-right mt-1 font-mono">${time}</div>
                                 </div>
                             </div>
                         `;
@@ -307,134 +229,48 @@
                         container.appendChild(msgDiv);
                     });
 
-                    // Scroll to bottom
                     container.scrollTop = container.scrollHeight;
                 }, (error) => {
-                    console.error("Mesajlar dinlenirken hata:", error);
+                    console.error("Mesaj yükleme hatası:", error);
                 });
         }
 
-        // SEND MESSAGE & IMAGE
         async function sendMessage(e) {
             e.preventDefault();
             const textInput = document.getElementById('messageInput');
             const text = textInput.value.trim();
 
-            if (!text && !selectedFile) return;
+            if (!text) return;
 
             const sendBtn = document.getElementById('sendBtn');
             sendBtn.disabled = true;
-            sendBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i>`;
-
-            let imageUrl = null;
-            let imageStoragePath = null;
 
             try {
-                // Upload Image if selected
-                if (selectedFile) {
-                    const fileExt = selectedFile.name.split('.').pop();
-                    imageStoragePath = `chat_images/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-                    const storageRef = storage.ref(imageStoragePath);
-                    
-                    const uploadTask = await storageRef.put(selectedFile);
-                    imageUrl = await uploadTask.ref.getDownloadURL();
-                }
-
-                // Save Message to Firestore
                 await db.collection("messages").add({
                     sender: currentUser,
-                    text: text || null,
-                    imageUrl: imageUrl || null,
-                    imageStoragePath: imageStoragePath || null,
+                    text: text,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Clear Inputs
                 textInput.value = '';
-                cancelImageSelection();
-
             } catch (err) {
                 alert("Mesaj gönderilemedi: " + err.message);
                 console.error(err);
             } finally {
                 sendBtn.disabled = false;
-                sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane text-sm"></i>`;
             }
         }
 
-        // DELETE MESSAGE
-        async function deleteMessage(docId, storagePath) {
+        async function deleteMessage(docId) {
             if (confirm("Bu mesajı silmek istediğinize emin misiniz?")) {
                 try {
-                    // Delete from Firestore
                     await db.collection("messages").doc(docId).delete();
-                    
-                    // Delete Image from Storage if exists
-                    if (storagePath) {
-                        const imageRef = storage.ref(storagePath);
-                        await imageRef.delete().catch(e => console.log("Görsel zaten silinmiş ya da bulunamadı."));
-                    }
                 } catch (err) {
-                    alert("Silme işlemi başarısız: " + err.message);
+                    alert("Silme hatası: " + err.message);
                 }
             }
         }
 
-        // IMAGE HANDLING
-        function handleImageSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                selectedFile = file;
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    document.getElementById('imagePreview').src = evt.target.result;
-                    document.getElementById('imageFileName').innerText = file.name;
-                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function cancelImageSelection() {
-            selectedFile = null;
-            document.getElementById('imageInput').value = '';
-            document.getElementById('imagePreviewContainer').classList.add('hidden');
-        }
-
-        // CONFIG MODAL LOGIC
-        function openConfigModal() {
-            const config = getSavedConfig() || {};
-            document.getElementById('cfgApiKey').value = config.apiKey || '';
-            document.getElementById('cfgAuthDomain').value = config.authDomain || '';
-            document.getElementById('cfgProjectId').value = config.projectId || '';
-            document.getElementById('cfgStorageBucket').value = config.storageBucket || '';
-            document.getElementById('cfgMessagingSenderId').value = config.messagingSenderId || '';
-            document.getElementById('cfgAppId').value = config.appId || '';
-
-            document.getElementById('configModal').classList.remove('hidden');
-        }
-
-        function closeConfigModal() {
-            document.getElementById('configModal').classList.add('hidden');
-        }
-
-        function saveFirebaseConfig(e) {
-            e.preventDefault();
-            const config = {
-                apiKey: document.getElementById('cfgApiKey').value.trim(),
-                authDomain: document.getElementById('cfgAuthDomain').value.trim(),
-                projectId: document.getElementById('cfgProjectId').value.trim(),
-                storageBucket: document.getElementById('cfgStorageBucket').value.trim(),
-                messagingSenderId: document.getElementById('cfgMessagingSenderId').value.trim(),
-                appId: document.getElementById('cfgAppId').value.trim()
-            };
-
-            localStorage.setItem('firebase_config', JSON.stringify(config));
-            closeConfigModal();
-            location.reload(); // Re-initialize app
-        }
-
-        // UTILS
         function escapeHtml(unsafe) {
             return unsafe
                  .replace(/&/g, "&amp;")
